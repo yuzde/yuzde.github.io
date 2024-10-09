@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yüzde Hesaplama</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 720px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #dfdbdb;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+        }
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #5f5;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #5f5;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .form-group {
+                margin-bottom: 20px;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            input[type="number"],
+            input[type="text"],
+            select,
+            button {
+                font-size: 14px;
+            }
+            button {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Yüzde Hesaplama</h1>
+        <form id="percentageForm">
+            <div class="form-group">
+                <label for="operation">İşlem Seçin:</label>
+                <select id="operation" name="operation" onchange="toggleFields()" required>
+                    <option value="percentageOfA">A sayısının %B'si kaçtır?</option>
+                    <option value="percentageOfB">A sayısı, B sayısının yüzde kaçıdır?</option>
+                    <option value="changePercentage">A sayısından B sayısına değişim oranı yüzde kaçtır?</option>
+                    <option value="increaseByPercentage">A sayısı, %B kadar artırılırsa kaç olur?</option>
+                    <option value="decreaseByPercentage">A sayısı, %B kadar azaltılırsa kaç olur?</option>
+                </select>
+            </div>
+
+            <div id="percentageOfAFields" class="calc-fields">
+                <div class="form-group">
+                    <label for="a1">A Sayısı:</label>
+                    <input type="number" id="a1" name="a1" required>
+                </div>
+                <div class="form-group">
+                    <label for="b1">B Sayısı (%):</label>
+                    <input type="number" id="b1" name="b1" required>
+                </div>
+                <button type="button" onclick="calculatePercentageOfA()">Hesapla</button>
+            </div>
+
+            <div id="percentageOfBFields" class="calc-fields hidden">
+                <div class="form-group">
+                    <label for="a2">A Sayısı:</label>
+                    <input type="number" id="a2" name="a2" required>
+                </div>
+                <div class="form-group">
+                    <label for="b2">B Sayısı:</label>
+                    <input type="number" id="b2" name="b2" required>
+                </div>
+                <button type="button" onclick="calculatePercentageOfB()">Hesapla</button>
+            </div>
+
+            <div id="changePercentageFields" class="calc-fields hidden">
+                <div class="form-group">
+                    <label for="a3">A Sayısı:</label>
+                    <input type="number" id="a3" name="a3" required>
+                </div>
+                <div class="form-group">
+                    <label for="b3">B Sayısı:</label>
+                    <input type="number" id="b3" name="b3" required>
+                </div>
+                <button type="button" onclick="calculateChangePercentage()">Hesapla</button>
+            </div>
+
+            <div id="increaseByPercentageFields" class="calc-fields hidden">
+                <div class="form-group">
+                    <label for="a4">A Sayısı:</label>
+                    <input type="number" id="a4" name="a4" required>
+                </div>
+                <div class="form-group">
+                    <label for="b4">B Sayısı (%):</label>
+                    <input type="number" id="b4" name="b4" required>
+                </div>
+                <button type="button" onclick="calculateIncreaseByPercentage()">Hesapla</button>
+            </div>
+
+            <div id="decreaseByPercentageFields" class="calc-fields hidden">
+                <div class="form-group">
+                    <label for="a5">A Sayısı:</label>
+                    <input type="number" id="a5" name="a5" required>
+                </div>
+                <div class="form-group">
+                    <label for="b5">B Sayısı (%):</label>
+                    <input type="number" id="b5" name="b5" required>
+                </div>
+                <button type="button" onclick="calculateDecreaseByPercentage()">Hesapla</button>
+            </div>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function toggleFields() {
+            const operation = document.getElementById('operation').value;
+            document.querySelectorAll('.calc-fields').forEach(el => el.classList.add('hidden'));
+            document.getElementById(operation + 'Fields').classList.remove('hidden');
+        }
+
+        function calculatePercentageOfA() {
+            const a = parseFloat(document.getElementById('a1').value);
+            const b = parseFloat(document.getElementById('b1').value);
+            if (isNaN(a) || isNaN(b)) {
+                document.getElementById('result').innerHTML = '<p>Lütfen geçerli sayılar girin.</p>';
+                return;
+            }
+            const result = (a * b) / 100;
+            document.getElementById('result').innerHTML = `
+                <p>A sayısının %${b}’si: ${result.toFixed(2)}</p>
+            `;
+        }
+
+        function calculatePercentageOfB() {
+            const a = parseFloat(document.getElementById('a2').value);
+            const b = parseFloat(document.getElementById('b2').value);
+            if (isNaN(a) || isNaN(b)) {
+                document.getElementById('result').innerHTML = '<p>Lütfen geçerli sayılar girin.</p>';
+                return;
+            }
+            const result = (a / b) * 100;
+            document.getElementById('result').innerHTML = `
+                <p>A sayısı, B sayısının %${result.toFixed(2)}’sidir.</p>
+            `;
+        }
+
+        function calculateChangePercentage() {
+            const a = parseFloat(document.getElementById('a3').value);
+            const b = parseFloat(document.getElementById('b3').value);
+            if (isNaN(a) || isNaN(b)) {
+                document.getElementById('result').innerHTML = '<p>Lütfen geçerli sayılar girin.</p>';
+                return;
+            }
+            const result = ((b - a) / a) * 100;
+            document.getElementById('result').innerHTML = `
+                <p>Değişim Oranı: ${result.toFixed(2)}%</p>
+            `;
+        }
+
+        function calculateIncreaseByPercentage() {
+            const a = parseFloat(document.getElementById('a4').value);
+            const b = parseFloat(document.getElementById('b4').value);
+            if (isNaN(a) || isNaN(b)) {
+                document.getElementById('result').innerHTML = '<p>Lütfen geçerli sayılar girin.</p>';
+                return;
+            }
+            const result = a * (1 + (b / 100));
+            document.getElementById('result').innerHTML = `
+                <p>A sayısı, %${b} kadar artırıldığında: ${result.toFixed(2)}</p>
+            `;
+        }
+
+        function calculateDecreaseByPercentage() {
+            const a = parseFloat(document.getElementById('a5').value);
+            const b = parseFloat(document.getElementById('b5').value);
+            if (isNaN(a) || isNaN(b)) {
+                document.getElementById('result').innerHTML = '<p>Lütfen geçerli sayılar girin.</p>';
+                return;
+            }
+            const result = a * (1 - (b / 100));
+            document.getElementById('result').innerHTML = `
+                <p>A sayısı, %${b} kadar azaltıldığında: ${result.toFixed(2)}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
